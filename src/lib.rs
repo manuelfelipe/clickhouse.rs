@@ -8,6 +8,7 @@ extern crate static_assertions;
 
 use std::{collections::HashMap, sync::Arc, time::Duration};
 
+use http::{HeaderMap, HeaderName, HeaderValue};
 use hyper::client::connect::HttpConnector;
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
@@ -57,6 +58,7 @@ pub struct Client {
     password: Option<String>,
     compression: Compression,
     options: HashMap<String, String>,
+    headers: HeaderMap,
 }
 
 impl Default for Client {
@@ -93,6 +95,7 @@ impl Client {
             password: None,
             compression: Compression::default(),
             options: HashMap::new(),
+            headers: HeaderMap::new(),
         }
     }
 
@@ -167,6 +170,22 @@ impl Client {
     /// ```
     pub fn with_option(mut self, name: impl Into<String>, value: impl Into<String>) -> Self {
         self.options.insert(name.into(), value.into());
+        self
+    }
+
+    /// Used to specify a header that will be passed to all queries.
+    ///
+    /// # Example
+    /// ```
+    /// # use clickhouse::Client;
+    /// Client::default().with_header(http::header::COOKIE, http::HeaderValue::from_static("A=1"));
+    /// ```
+    pub fn with_header(
+        mut self,
+        name: impl Into<HeaderName>,
+        value: impl Into<HeaderValue>,
+    ) -> Self {
+        self.headers.append(name.into(), value.into());
         self
     }
 

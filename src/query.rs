@@ -152,6 +152,10 @@ impl Query {
 
         let mut builder = Request::builder().method(method).uri(url.as_str());
 
+        for (name, value) in &self.client.headers {
+            builder = builder.header(name.clone(), value.clone());
+        }
+
         if content_length == 0 {
             builder = builder.header(CONTENT_LENGTH, "0");
         } else {
