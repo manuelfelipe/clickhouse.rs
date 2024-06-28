@@ -189,6 +189,15 @@ impl Client {
         self
     }
 
+    // tmp hack while fighting with http crate versions
+    pub fn with_header_values(mut self, name: String, value: String) -> Self {
+        let name = HeaderName::from_bytes(name.as_bytes()).unwrap(); // TODO: handle error
+        let value = HeaderValue::from_bytes(value.as_bytes()).unwrap(); // TODO: handle error
+
+        self.headers.append(name, value);
+        self
+    }
+
     /// Starts a new INSERT statement.
     ///
     /// # Panics
